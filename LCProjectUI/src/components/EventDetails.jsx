@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Link } from 'react-router-dom';
 
 const EventDetails = () => {
     const [data, setData] = useState([]);
@@ -139,10 +138,10 @@ const EventDetails = () => {
                     <div className='mb-3 d-flex justify-content-between align-items-center'>
                         <h1 className='text-primary'>Event Finder</h1>
                         <div>
-                            <Link to="/login" className='btn btn-outline-primary me-2'>Login</Link>
-                            <Link to="/register" className='btn btn-outline-primary me-2'>Register</Link>
-                            <Link to="/about" className='btn btn-outline-primary me-2'>About</Link>
-                            <Link to="/contact" className='btn btn-outline-primary'>Contact</Link>
+                            <a href="/login" className='btn btn-outline-primary me-2'>Login</a>
+                            <a href="/register" className='btn btn-outline-primary me-2'>Register</a>
+                            <a href="/about" className='btn btn-outline-primary me-2'>About</a>
+                            <a href="/contact" className='btn btn-outline-primary'>Contact</a>
                         </div>
                     </div>
 

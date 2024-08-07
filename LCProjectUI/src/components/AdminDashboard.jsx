@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/AdminDashboard.css'; // Adjust as needed
+import { useAuth } from '../auth/AuthContext'; // Import the useAuth hook
 
 const AdminDashboard = () => {
   const [events, setEvents] = useState([]);
@@ -12,20 +13,30 @@ const AdminDashboard = () => {
   const [editEvent, setEditEvent] = useState(null);
 
   const navigate = useNavigate(); // Use useNavigate hook for navigation
+  const { user, logout } = useAuth(); // Access user and logout function from AuthContext
 
   useEffect(() => {
     const fetchData = async () => {
+      const token = localStorage.getItem('authToken'); // Retrieve token from localStorage
+
       try {
-        const response = await axios.get('http://localhost:8080/api/admin/events');
+        const response = await axios.get('http://localhost:8080/api/admin/events', {
+          headers: { Authorization: `Bearer ${token}` }, // Add token to request headers
+        });
         setEvents(response.data);
         setFilteredEvents(response.data);
       } catch (error) {
         console.error('Error fetching data', error);
-        // Optionally, redirect or show a message if unauthorized
+
+        if (error.response?.status === 401) {
+          // Unauthorized, probably due to an expired or invalid token
+          await logout(); // Call logout function
+          navigate('/login'); // Redirect to login page
+        }
       }
     };
     fetchData();
-  }, []);
+  }, [navigate, logout]); // Add navigate and logout as dependencies
 
   const filterEvents = (status) => {
     let filteredEvents = events;
@@ -47,9 +58,14 @@ const AdminDashboard = () => {
   };
 
   const saveChanges = async () => {
+    const token = localStorage.getItem('authToken'); // Retrieve token from localStorage
+
     try {
       await axios.put(`http://localhost:8080/api/admin/events/${editEvent.id}`, JSON.stringify(editEvent), {
-        headers: { 'Content-Type': 'application/json' }
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Add token to request headers
+        },
       });
       toggleEditPopup(null);
       fetchData(); // Refresh the event list
@@ -59,10 +75,14 @@ const AdminDashboard = () => {
   };
 
   const deleteEvent = async (eventId) => {
+    const token = localStorage.getItem('authToken'); // Retrieve token from localStorage
     const confirmed = window.confirm('Are you sure you want to delete this event?');
     if (!confirmed) return;
+
     try {
-      await axios.delete(`http://localhost:8080/api/admin/events/${eventId}`);
+      await axios.delete(`http://localhost:8080/api/admin/events/${eventId}`, {
+        headers: { Authorization: `Bearer ${token}` }, // Add token to request headers
+      });
       fetchData(); // Refresh the event list
     } catch (error) {
       console.error('Error deleting the event:', error);

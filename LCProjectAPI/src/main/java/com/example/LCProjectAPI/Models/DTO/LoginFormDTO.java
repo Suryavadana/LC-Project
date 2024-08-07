@@ -1,25 +1,19 @@
 package com.example.LCProjectAPI.Models.DTO;
 
-
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 public class LoginFormDTO {
 
-    // Properties
     @NotBlank(message = "Username cannot be blank")
     @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters")
-    @NotNull
     private String username;
 
     @NotBlank(message = "Password cannot be blank")
     @Size(min = 3, max = 20, message = "Password must be between 3 and 20 characters")
-    @NotNull
     private String password;
 
-
-
+    // Getters and Setters
     public String getUsername() {
         return username;
     }
@@ -35,5 +29,4 @@ public class LoginFormDTO {
     public void setPassword(String password) {
         this.password = password;
     }
-
 }

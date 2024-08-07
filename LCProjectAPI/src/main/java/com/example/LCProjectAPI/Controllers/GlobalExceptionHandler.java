@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import javax.validation.ConstraintViolationException;
+import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -51,4 +52,7 @@ public class GlobalExceptionHandler {
         String errorMessage = "An unexpected error occurred: " + ex.getMessage();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
     }
+
+
+
 }

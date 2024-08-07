@@ -1,5 +1,6 @@
+// src/App.js
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { Routes, Route, Navigate, Link } from 'react-router-dom';
 import RegistrationForm from './components/RegistrationForm';
 import LoginForm from './components/LoginForm';
 import EventDetails from './components/EventDetails';
@@ -10,22 +11,18 @@ import Contact from './components/Contact';
 import EventForm from './components/EventForm';
 import { AuthProvider, useAuth } from './auth/AuthContext';
 
-// Component to protect routes based on authentication
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
   return user ? children : <Navigate to="/login" />;
 };
 
-// Component to protect routes based on admin role
 const AdminRoute = ({ children }) => {
   const { user } = useAuth();
   return user && user.role === 'admin' ? children : <Navigate to="/events" />;
 };
 
-// Component to show different navigation links based on authentication
 const Navigation = () => {
   const { user, logout } = useAuth();
-
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light mb-4">
       <div className="container">
@@ -66,7 +63,6 @@ const Navigation = () => {
   );
 };
 
-// 404 Page Component
 const NotFound = () => (
   <div className="container text-center">
     <h1 className="display-4">404</h1>
@@ -78,42 +74,40 @@ const NotFound = () => (
 const App = () => {
   return (
     <AuthProvider>
-      <Router>
-        <Navigation /> {/* Display navigation links */}
-        <Routes>
-          <Route path="/" element={<EventDetails />} />
-          <Route path="/register" element={<RegistrationForm />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route
-            path="/events"
-            element={
-              <ProtectedRoute>
-                <Events />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/event-details/:id" element={<EventDetails />} />
-          <Route
-            path="/admin-dashboard"
-            element={
-              <AdminRoute>
-                <AdminDashboard />
-              </AdminRoute>
-            }
-          />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/about" element={<About />} />
-          <Route
-            path="/create-event"
-            element={
-              <ProtectedRoute>
-                <EventForm />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
+      <Navigation />
+      <Routes>
+        <Route path="/" element={<EventDetails />} />
+        <Route path="/register" element={<RegistrationForm />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route
+          path="/events"
+          element={
+            <ProtectedRoute>
+              <Events />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/event-details/:id" element={<EventDetails />} />
+        <Route
+          path="/admin-dashboard"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/about" element={<About />} />
+        <Route
+          path="/create-event"
+          element={
+            <ProtectedRoute>
+              <EventForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </AuthProvider>
   );
 };

@@ -1,219 +1,167 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 const EventForm = () => {
-  const [formData, setFormData] = useState({
-    eventName: '',
-    description: '',
-    eventDate: '',
-    eventTime: '',
-    eventLocation: '',
-    eventPrice: '',
-    eventCategory: '',
-    zipCode: '',
-    file: null,
-  });
-  const [imagePreview, setImagePreview] = useState('');
-  const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+    const [eventName, setEventName] = useState('');
+    const [eventDate, setEventDate] = useState('');
+    const [eventLocation, setEventLocation] = useState('');
+    const [eventDescription, setEventDescription] = useState('');
+    const [eventCategory, setEventCategory] = useState('');
+    const [eventPrice, setEventPrice] = useState('');
+    const [eventZipCode, setEventZipCode] = useState('');
+    const [eventTime, setEventTime] = useState('');
+    const [eventImage, setEventImage] = useState(null);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
-  const navigate = useNavigate();
+    const handleFileChange = (e) => {
+        setEventImage(e.target.files[0]);
+    };
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === 'file') {
-      setFormData(prevData => ({ ...prevData, file: files[0] }));
-      setImagePreview(URL.createObjectURL(files[0]));
-    } else {
-      setFormData(prevData => ({ ...prevData, [name]: value }));
-    }
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('eventName', eventName);
+        formData.append('eventDate', eventDate);
+        formData.append('eventLocation', eventLocation);
+        formData.append('eventDescription', eventDescription);
+        formData.append('eventCategory', eventCategory);
+        formData.append('eventPrice', eventPrice);
+        formData.append('eventZipCode', eventZipCode);
+        formData.append('eventTime', eventTime);
+        if (eventImage) formData.append('eventImage', eventImage);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+        try {
+            await axios.post('http://localhost:8080/api/events', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            setSuccess('Event created successfully!');
+            // Reset form fields
+            setEventName('');
+            setEventDate('');
+            setEventLocation('');
+            setEventDescription('');
+            setEventCategory('');
+            setEventPrice('');
+            setEventZipCode('');
+            setEventTime('');
+            setEventImage(null);
+        } catch (err) {
+            console.error('Error creating event:', err);
+            setError('Failed to create event. Please try again.');
+        }
+    };
 
-    const data = new FormData();
-    Object.keys(formData).forEach(key => {
-      if (key === 'file' && formData[key]) {
-        data.append(key, formData[key]);
-      } else {
-        data.append(key, formData[key]);
-      }
-    });
-
-    try {
-      const response = await axios.post('http://localhost:8080/api/events', data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      setSuccessMessage('Event created successfully!');
-      setError('');
-      setFormData({
-        eventName: '',
-        description: '',
-        eventDate: '',
-        eventTime: '',
-        eventLocation: '',
-        eventPrice: '',
-        eventCategory: '',
-        zipCode: '',
-        file: null,
-      });
-      setImagePreview('');
-    } catch (err) {
-      console.error('Error creating event:', err);
-      setError(`Failed to create event. Please try again. Error: ${err.response?.data?.message || err.message}`);
-      setSuccessMessage('');
-    }
-  };
-
-  return (
-    <div className='container py-5'>
-      <h1>Create Event</h1>
-      <button className='btn btn-secondary mb-3' onClick={() => navigate('/events')}>
-        Back to Events
-      </button>
-      <form onSubmit={handleSubmit}>
-        {/* Event Name */}
-        <div className='mb-3'>
-          <label htmlFor='eventName' className='form-label'>Event Name</label>
-          <input
-            type='text'
-            id='eventName'
-            name='eventName'
-            className='form-control'
-            value={formData.eventName}
-            onChange={handleChange}
-            required
-          />
+    return (
+        <div className='container py-5'>
+            <h1 className='text-primary'>Create Event</h1>
+            {error && <div className="alert alert-danger">{error}</div>}
+            {success && <div className="alert alert-success">{success}</div>}
+            <form onSubmit={handleSubmit}>
+                <div className='mb-3'>
+                    <label htmlFor='eventName' className='form-label'>Event Name</label>
+                    <input
+                        type='text'
+                        className='form-control'
+                        id='eventName'
+                        value={eventName}
+                        onChange={(e) => setEventName(e.target.value)}
+                        required
+                    />
+                </div>
+                <div className='mb-3'>
+                    <label htmlFor='eventDate' className='form-label'>Event Date</label>
+                    <input
+                        type='date'
+                        className='form-control'
+                        id='eventDate'
+                        value={eventDate}
+                        onChange={(e) => setEventDate(e.target.value)}
+                        required
+                    />
+                </div>
+                <div className='mb-3'>
+                    <label htmlFor='eventTime' className='form-label'>Event Time</label>
+                    <input
+                        type='time'
+                        className='form-control'
+                        id='eventTime'
+                        value={eventTime}
+                        onChange={(e) => setEventTime(e.target.value)}
+                        required
+                    />
+                </div>
+                <div className='mb-3'>
+                    <label htmlFor='eventLocation' className='form-label'>Event Location</label>
+                    <input
+                        type='text'
+                        className='form-control'
+                        id='eventLocation'
+                        value={eventLocation}
+                        onChange={(e) => setEventLocation(e.target.value)}
+                        required
+                    />
+                </div>
+                <div className='mb-3'>
+                    <label htmlFor='eventZipCode' className='form-label'>Event Zip Code</label>
+                    <input
+                        type='text'
+                        className='form-control'
+                        id='eventZipCode'
+                        value={eventZipCode}
+                        onChange={(e) => setEventZipCode(e.target.value)}
+                        required
+                    />
+                </div>
+                <div className='mb-3'>
+                    <label htmlFor='eventDescription' className='form-label'>Event Description</label>
+                    <textarea
+                        className='form-control'
+                        id='eventDescription'
+                        rows='3'
+                        value={eventDescription}
+                        onChange={(e) => setEventDescription(e.target.value)}
+                        required
+                    ></textarea>
+                </div>
+                <div className='mb-3'>
+                    <label htmlFor='eventCategory' className='form-label'>Event Category</label>
+                    <input
+                        type='text'
+                        className='form-control'
+                        id='eventCategory'
+                        value={eventCategory}
+                        onChange={(e) => setEventCategory(e.target.value)}
+                        required
+                    />
+                </div>
+                <div className='mb-3'>
+                    <label htmlFor='eventPrice' className='form-label'>Event Price</label>
+                    <input
+                        type='number'
+                        className='form-control'
+                        id='eventPrice'
+                        value={eventPrice}
+                        onChange={(e) => setEventPrice(e.target.value)}
+                        required
+                        step='0.01'
+                    />
+                </div>
+                <div className='mb-3'>
+                    <label htmlFor='eventImage' className='form-label'>Event Image</label>
+                    <input
+                        type='file'
+                        className='form-control'
+                        id='eventImage'
+                        onChange={handleFileChange}
+                    />
+                </div>
+                <button type='submit' className='btn btn-primary'>Create Event</button>
+            </form>
         </div>
-
-        {/* Description */}
-        <div className='mb-3'>
-          <label htmlFor='description' className='form-label'>Description</label>
-          <textarea
-            id='description'
-            name='description'
-            className='form-control'
-            value={formData.description}
-            onChange={handleChange}
-            rows='3'
-            required
-          />
-        </div>
-
-        {/* Event Date */}
-        <div className='mb-3'>
-          <label htmlFor='eventDate' className='form-label'>Event Date</label>
-          <input
-            type='date'
-            id='eventDate'
-            name='eventDate'
-            className='form-control'
-            value={formData.eventDate}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Event Time */}
-        <div className='mb-3'>
-          <label htmlFor='eventTime' className='form-label'>Event Time</label>
-          <input
-            type='time'
-            id='eventTime'
-            name='eventTime'
-            className='form-control'
-            value={formData.eventTime}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Event Location */}
-        <div className='mb-3'>
-          <label htmlFor='eventLocation' className='form-label'>Event Location</label>
-          <input
-            type='text'
-            id='eventLocation'
-            name='eventLocation'
-            className='form-control'
-            value={formData.eventLocation}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Event Price */}
-        <div className='mb-3'>
-          <label htmlFor='eventPrice' className='form-label'>Event Price</label>
-          <input
-            type='number'
-            id='eventPrice'
-            name='eventPrice'
-            className='form-control'
-            value={formData.eventPrice}
-            onChange={handleChange}
-            step='0.01'
-            required
-          />
-        </div>
-
-        {/* Event Category */}
-        <div className='mb-3'>
-          <label htmlFor='eventCategory' className='form-label'>Event Category</label>
-          <input
-            type='text'
-            id='eventCategory'
-            name='eventCategory'
-            className='form-control'
-            value={formData.eventCategory}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Zip Code */}
-        <div className='mb-3'>
-          <label htmlFor='zipCode' className='form-label'>Zip Code</label>
-          <input
-            type='text'
-            id='zipCode'
-            name='zipCode'
-            className='form-control'
-            value={formData.zipCode}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Event Image */}
-        <div className='mb-3'>
-          <label htmlFor='file' className='form-label'>Event Image</label>
-          <input
-            type='file'
-            id='file'
-            name='file'
-            className='form-control'
-            onChange={handleChange}
-          />
-          {imagePreview && (
-            <div className='mt-3'>
-              <img src={imagePreview} alt='Preview' className='img-fluid' style={{ maxWidth: '300px' }} />
-            </div>
-          )}
-        </div>
-
-        {/* Submit Button */}
-        <button type='submit' className='btn btn-primary'>Create Event</button>
-      </form>
-      {error && <div className='alert alert-danger mt-3'>{error}</div>}
-      {successMessage && <div className='alert alert-success mt-3'>{successMessage}</div>}
-    </div>
-  );
+    );
 };
 
 export default EventForm;

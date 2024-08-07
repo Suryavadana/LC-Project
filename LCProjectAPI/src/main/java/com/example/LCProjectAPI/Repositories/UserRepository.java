@@ -1,11 +1,10 @@
 package com.example.LCProjectAPI.Repositories;
 
-
 import com.example.LCProjectAPI.Models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface UserRepository extends JpaRepository<User, Long> {
-
+@Repository
+public interface UserRepository extends JpaRepository<User, Integer> {
     User findByUsername(String username);
-//    <S extends User> S save(S user);
 }

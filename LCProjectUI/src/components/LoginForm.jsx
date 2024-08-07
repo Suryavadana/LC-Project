@@ -1,13 +1,14 @@
+// src/components/LoginForm.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { useAuth } from '../auth/AuthContext';
-import '../styles/LoginForm.css';
 
 const LoginForm = () => {
   const [form, setForm] = useState({ username: '', password: '' });
   const [message, setMessage] = useState('');
-  const { login } = useAuth();
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -17,15 +18,19 @@ const LoginForm = () => {
     e.preventDefault();
 
     try {
-      await login(form);  // Call login function from useAuth
-      const user = JSON.parse(localStorage.getItem('user'));
-      if (user?.role === 'admin') {
-        navigate('/admin');  // Redirect to admin dashboard if user is admin
+      const response = await axios.post('http://localhost:8080/auth/login', form, { withCredentials: true });
+      if (response.status === 200) {
+        await login(response.data.username); // Call login method from AuthContext with username
+        navigate('/events'); // Navigate to /events after successful login
       } else {
-        navigate('/events');  // Redirect to events page for normal users
+        setMessage(response.data.message || 'Login failed');
       }
     } catch (error) {
-      setMessage(error.message || 'An error occurred. Please try again.');  // Handle login errors
+      if (error.response) {
+        setMessage(error.response.data.message || 'Login failed');
+      } else {
+        setMessage('An error occurred. Please try again.');
+      }
     }
   };
 
@@ -33,12 +38,6 @@ const LoginForm = () => {
     <div className="container mt-5">
       <div className="card">
         <div className="card-body">
-        <div className="mb-4">
-            <button className="btn btn-secondary me-2" onClick={() => navigate('/register')}>Register</button>
-            <button className="btn btn-secondary me-2" onClick={() => navigate(-1)}>Back</button>
-            <button className="btn btn-secondary me-2" onClick={() => navigate('/about')}>About</button>
-            <button className="btn btn-secondary" onClick={() => navigate('/contact')}>Contact</button>
-          </div>
           <h2 className="card-title">Login Form</h2>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
@@ -50,6 +49,7 @@ const LoginForm = () => {
                 value={form.username}
                 onChange={handleChange}
                 required
+                autoComplete="username"
               />
             </div>
             <div className="mb-3">
@@ -61,12 +61,12 @@ const LoginForm = () => {
                 value={form.password}
                 onChange={handleChange}
                 required
+                autoComplete="current-password"
               />
             </div>
             <button type="submit" className="btn btn-primary">Login</button>
           </form>
           {message && <p className="mt-3 text-danger">{message}</p>}
-         
         </div>
       </div>
     </div>
