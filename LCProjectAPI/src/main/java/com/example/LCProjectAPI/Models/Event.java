@@ -27,6 +27,9 @@ public class Event {
     @NotBlank(message = "Event location must not be empty")
     private String eventLocation;
 
+    @NotBlank(message = "Please provide Event City.")
+    private String eventCityZip;
+
     @NotBlank(message = "Please provide Event Description.")
     @Size(min = 5, message = "Description must be at least 5 characters.")
     private String description;
@@ -43,7 +46,7 @@ public class Event {
     // private String eventImage;   // Stores image data in byte array format.
 
     @Column(columnDefinition = "LONGTEXT")
-    private String eventImage;
+    private byte[] eventImage;
     private String imageMimeType;  // Stores MIME type of image. image/jpeg , png . gif etc.
 
     public String approvalStatus = "Pending";
@@ -114,11 +117,19 @@ public class Event {
     }
 
 
-    public String getEventImage() {
+    public String getEventCityZip() {
+        return eventCityZip;
+    }
+
+    public void setEventCityZip(String eventCityZip) {
+        this.eventCityZip = eventCityZip;
+    }
+
+    public byte[] getEventImage() {
         return eventImage;
     }
 
-    public void setEventImage(String eventImage) {
+    public void setEventImage(byte[] eventImage) {
         this.eventImage = eventImage;
     }
 

@@ -3,6 +3,7 @@ package com.example.LCProjectAPI.Controllers;
 import com.example.LCProjectAPI.Models.DTO.LoginFormDTO;
 import com.example.LCProjectAPI.Models.DTO.RegistrationFormDTO;
 import com.example.LCProjectAPI.Models.User;
+import com.example.LCProjectAPI.Repositories.EventRepository;
 import com.example.LCProjectAPI.Repositories.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,10 @@ import javax.validation.Valid;
 public class AuthController {
 
     private final UserRepository userRepository;
+
+    @Autowired
+    public EventRepository eventRepository;
+
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
